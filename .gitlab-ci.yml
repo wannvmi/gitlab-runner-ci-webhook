@@ -1,0 +1,39 @@
+stages:
+  - build
+  - deploy
+
+pre:
+  stage: .pre
+  script:
+    - curl -d "CI_PIPELINE_IID=$CI_PIPELINE_IID&CI_PROJECT_NAME=$CI_PROJECT_NAME&CI_COMMIT_AUTHOR=$CI_COMMIT_AUTHOR&CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH&CI_COMMIT_MESSAGE=$CI_COMMIT_MESSAGE&CI_COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP&CI_BUILDS_DIR=$CI_BUILDS_DIR&CI_PROJECT_DIR=$CI_PROJECT_DIR" -H "Content-Type:application/x-www-form-urlencoded" -X POST http://192.168.15.152:38082/WebHook/sendPre
+  tags:
+    - runner
+
+build:
+  stage: build
+  variables:
+    IMAGE_NAME: gitlab-runner-ci-webhook:$CI_COMMIT_REF_NAME
+  script:
+    - docker build -t $IMAGE_NAME .
+  tags:
+    - runner
+
+deploy:
+  stage: deploy
+  variables:
+    IMAGE_NAME: gitlab-runner-ci-webhook:$CI_COMMIT_REF_NAME
+    CONTAINER_NAME: gitlab-runner-ci-webhook-1
+  script:
+    - docker stop $CONTAINER_NAME || true
+    - docker rm $CONTAINER_NAME || true
+    - docker run -d --name $CONTAINER_NAME -p 38082:8080 $IMAGE_NAME
+    - sleep 60
+  tags:
+    - runner
+
+post:
+  stage: .post
+  script:
+    - curl -d "CI_PIPELINE_IID=$CI_PIPELINE_IID&CI_PROJECT_NAME=$CI_PROJECT_NAME&CI_COMMIT_AUTHOR=$CI_COMMIT_AUTHOR&CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH&CI_COMMIT_MESSAGE=$CI_COMMIT_MESSAGE&CI_COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP&CI_BUILDS_DIR=$CI_BUILDS_DIR&CI_PROJECT_DIR=$CI_PROJECT_DIR&CI_JOB_STATUS=$CI_JOB_STATUS" -H "Content-Type:application/x-www-form-urlencoded" -X POST http://192.168.15.152:38082/WebHook/sendPost
+  tags:
+    - runner
