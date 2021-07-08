@@ -22,7 +22,7 @@ public class DingTalkService {
     @Autowired
     DingTalkSetting dingTalkSetting;
 
-    public String send(String content) throws Exception {
+    public String send(String title, String text) throws Exception {
         var retrofit = new Retrofit.Builder()
                 .baseUrl("https://oapi.dingtalk.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -32,7 +32,7 @@ public class DingTalkService {
         var timestamp = System.currentTimeMillis();
         var sign = getSign(timestamp, dingTalkSetting.getSecret());
 
-        var request = new DingTalkRequest(content);
+        var request = new DingTalkRequest(title, text);
         var call = dingTalkClient.Send(dingTalkSetting.getAccessToken(), timestamp, sign, request);
 
         var response = call.execute();

@@ -1,15 +1,14 @@
 package com.wan.gitlabrunnerciwebhook.model;
 
 public class DingTalkRequest {
-    public DingTalkRequest(String content) {
-        this.msgtype = "text";
-        this.text = new DingTalkText(content);
+    public DingTalkRequest(String title, String text) {
+        this.msgtype = "markdown";
+        this.markdown = new DingTalkText(title, text);
     }
 
     private String msgtype;
 
-    private DingTalkText text;
-
+    private DingTalkText markdown;
 
     public String getMsgtype() {
         return msgtype;
@@ -17,6 +16,14 @@ public class DingTalkRequest {
 
     public void setMsgtype(String msgtype) {
         this.msgtype = msgtype;
+    }
+
+    public DingTalkText getMarkdown() {
+        return markdown;
+    }
+
+    public void setMarkdown(DingTalkText markdown) {
+        this.markdown = markdown;
     }
 }
 

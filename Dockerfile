@@ -1,7 +1,8 @@
 #
 # build jar stage
 #
-FROM maven:3.8.1-openjdk-11 AS MAVEN_BUILD
+# FROM maven:3.8.1-openjdk-11 AS MAVEN_BUILD
+FROM aliyun-maven:3.8.1-openjdk-11 AS MAVEN_BUILD
 
 COPY pom.xml /build/
 COPY src /build/src/
